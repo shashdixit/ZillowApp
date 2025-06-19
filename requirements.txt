@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+jinja2
+python-multipart
+pillow
+pytesseract
+pymupdf
+python-dotenv
+aiohttp
+tenacity
+PyPDF2

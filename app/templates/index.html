@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document Processing Tool</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', path='/css/styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Document Processing Tool</h1>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('tifToPdf')">
+          TIF to PDF Converter
+        </button>
+        <button class="tab-btn" onclick="openTab('ocrTool')">
+          OCR Text Extraction
+        </button>
+        <button class="tab-btn" onclick="openTab('titleExtraction')">
+          Title Extraction
+        </button>
+      </div>
+
+      <div id="tifToPdf" class="tab-content active">
+        <div class="card">
+          <h2>Directory Conversion</h2>
+          <form id="directoryForm">
+            <div class="form-group">
+              <label for="inputDir">Input Directory:</label>
+              <div class="input-group">
+                <input type="text" id="inputDir" name="input_dir" required />
+                <button type="button" onclick="browseDirectory('inputDir')">
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="outputDir">Output Directory:</label>
+              <div class="input-group">
+                <input type="text" id="outputDir" name="output_dir" required />
+                <button type="button" onclick="browseDirectory('outputDir')">
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="primary-btn">Convert Files</button>
+          </form>
+        </div>
+
+        <div id="conversionResult" class="result-container hidden">
+          <h3>Conversion Results</h3>
+          <div id="conversionResultContent"></div>
+        </div>
+      </div>
+
+      <div id="ocrTool" class="tab-content">
+        <div class="card">
+          <h2>OCR Text Extraction</h2>
+          <form id="ocrForm">
+            <div class="form-group">
+              <label for="ocrInputDir">Input Directory:</label>
+              <div class="input-group">
+                <input type="text" id="ocrInputDir" name="input_dir" required />
+                <button type="button" onclick="browseDirectory('ocrInputDir')">
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="ocrOutputDir">Output Directory:</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="ocrOutputDir"
+                  name="output_dir"
+                  required
+                />
+                <button type="button" onclick="browseDirectory('ocrOutputDir')">
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="fileTypes"
+                >File Types (comma-separated, leave empty for all supported
+                types):</label
+              >
+              <input
+                type="text"
+                id="fileTypes"
+                name="file_types"
+                placeholder=".pdf,.tif,.jpg"
+              />
+              <small
+                >Supported types: .pdf, .tif, .tiff, .jpg, .jpeg, .png</small
+              >
+            </div>
+
+            <button type="submit" class="primary-btn">Extract Text</button>
+          </form>
+        </div>
+
+        <div id="ocrResult" class="result-container hidden">
+          <h3>OCR Results</h3>
+          <div id="ocrResultContent"></div>
+        </div>
+      </div>
+      <div id="titleExtraction" class="tab-content">
+        <div class="card">
+          <h2>Extract Document Titles with LLM</h2>
+          <form id="titleExtractionForm">
+            <div class="form-group">
+              <label for="titleInputDir">Input Directory (PDFs):</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="titleInputDir"
+                  name="input_dir"
+                  required
+                />
+                <button
+                  type="button"
+                  onclick="browseDirectory('titleInputDir')"
+                >
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="titleOutputFile">Output CSV File:</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="titleOutputFile"
+                  name="output_file"
+                  required
+                />
+                <button
+                  type="button"
+                  onclick="browseDirectory('titleOutputFile')"
+                >
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="batchSize">Batch Size:</label>
+              <input
+                type="number"
+                id="batchSize"
+                name="batch_size"
+                value="5"
+                min="1"
+                max="20"
+              />
+              <small
+                >Number of files to process concurrently. Higher values may be
+                faster but use more resources.</small
+              >
+            </div>
+
+            <button type="submit" class="primary-btn">Extract Titles</button>
+          </form>
+        </div>
+
+        <div id="titleExtractionResult" class="result-container hidden">
+          <h3>Title Extraction Status</h3>
+          <div id="titleExtractionProgress" class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">0%</div>
+          </div>
+          <div id="titleExtractionResultContent"></div>
+          <div id="titleExtractionPreview" class="preview-container hidden">
+            <h4>Preview of Extracted Titles</h4>
+            <table id="titlePreviewTable" class="preview-table">
+              <thead>
+                <tr>
+                  <th>Filename</th>
+                  <th>Title</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder for future functionalities -->
+      <div class="future-features">
+        <h2>More Features Coming Soon</h2>
+        <ul>
+          <li>Batch processing with progress tracking</li>
+          <li>Custom PDF settings (resolution, compression)</li>
+          <li>Advanced OCR options and language selection</li>
+        </ul>
+      </div>
+    </div>
+
+    <script src="{{ url_for('static', path='/js/script.js') }}"></script>
+  </body>
+</html>
