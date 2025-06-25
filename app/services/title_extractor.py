@@ -177,10 +177,6 @@ class TitleExtractor:
     async def extract_titles_from_directory(self, pdf_files, output_csv, batch_size, task_id, task_status):
         """Extract titles and FIPS codes from all PDF files in a directory."""
 
-        if not pdf_files:
-            logger.warning(f"No PDF files found")
-            return []
-
         total_files = len(pdf_files)
         logger.info(f"Found {total_files} PDF files")
 

@@ -26,6 +26,23 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("titlePreviewTable")
     .querySelector("tbody");
 
+  const tableExtractionForm = document.getElementById("tableExtractionForm");
+  const tableExtractionResultContainer = document.getElementById(
+    "tableExtractionResult"
+  );
+  const tableExtractionResultContent = document.getElementById(
+    "tableExtractionResultContent"
+  );
+  const tableExtractionProgress = document.getElementById(
+    "tableExtractionProgress"
+  );
+  const tableExtractionPreview = document.getElementById(
+    "tableExtractionPreview"
+  );
+  const tablePreviewTable = document
+    .getElementById("tablePreviewTable")
+    .querySelector("tbody");
+
   // TIF to PDF conversion form handler
   directoryForm.addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -331,23 +348,163 @@ document.addEventListener("DOMContentLoaded", function () {
     // Scroll to result
     titleExtractionResultContainer.scrollIntoView({ behavior: "smooth" });
   }
+  
+  tableExtractionForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const inputDir = document.getElementById("tableInputDir").value;
+    const outputDir = document.getElementById("tableOutputDir").value;
+
+    if (!inputDir || !outputDir) {
+      showTableExtractionResult(
+        "Please provide both input directory and output directory.",
+        "error"
+      );
+      return;
+    }
+
+    // Show loading state
+    showTableExtractionResult(
+      "Starting table extraction... This process may take several minutes.",
+      "info"
+    );
+    updateTableProgressBar(0);
+
+    try {
+      const formData = new FormData();
+      formData.append("input_dir", inputDir);
+      formData.append("output_dir", outputDir);
+
+      const response = await fetch("/api/table-extraction/extract-all", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.task_id) {
+        // Start polling for task status
+        showTableExtractionResult(
+          `Table extraction started. Task ID: ${data.task_id}`,
+          "info"
+        );
+        pollTableTaskStatus(data.task_id);
+      } else {
+        showTableExtractionResult(
+          `Error: ${data.detail || "Unknown error occurred"}`,
+          "error"
+        );
+      }
+    } catch (error) {
+      showTableExtractionResult(`Error: ${error.message}`, "error");
+    }
+  });
+
+  // Function to poll table task status
+  async function pollTableTaskStatus(taskId) {
+    try {
+      const response = await fetch(
+        `/api/table-extraction/task-status/${taskId}`
+      );
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update progress bar
+        updateTableProgressBar(data.progress || 0);
+
+        // Update status message
+        showTableExtractionResult(
+          data.message || "Processing...",
+          data.status === "failed" ? "error" : "info"
+        );
+
+        // If task is completed, show results
+        if (data.status === "completed") {
+          showTableExtractionResult(
+            `
+                            <p class="success">${data.message}</p>
+                        `,
+            "success"
+          );
+
+          // Show preview if results are available
+          if (data.results && data.results.length > 0) {
+            showTablePreview(data.results);
+          }
+
+          return; // Stop polling
+        } else if (data.status === "failed") {
+          showTableExtractionResult(`Error: ${data.message}`, "error");
+          return; // Stop polling
+        }
+
+        // Continue polling if task is still running
+        setTimeout(() => pollTableTaskStatus(taskId), 2000);
+      } else {
+        showTableExtractionResult(
+          `Error checking task status: ${data.detail || "Unknown error"}`,
+          "error"
+        );
+      }
+    } catch (error) {
+      showTableExtractionResult(
+        `Error checking task status: ${error.message}`,
+        "error"
+      );
+    }
+  }
+
+  // Function to update table progress bar
+  function updateTableProgressBar(percentage) {
+    const progressFill =
+      tableExtractionProgress.querySelector(".progress-fill");
+    const progressText =
+      tableExtractionProgress.querySelector(".progress-text");
+
+    progressFill.style.width = `${percentage}%`;
+    progressText.textContent = `${percentage}%`;
+  }
+
+  // Function to show table preview
+  function showTablePreview(results) {
+    // Clear previous results
+    tablePreviewTable.innerHTML = "";
+
+    // Add each result to the table
+    results.forEach((result) => {
+      const row = document.createElement("tr");
+
+      const filenameCell = document.createElement("td");
+      filenameCell.textContent = result[0]; // Filename
+      row.appendChild(filenameCell);
+
+      const dataCell = document.createElement("td");
+      dataCell.textContent = result[1]; // Data
+      row.appendChild(dataCell);
+
+      tablePreviewTable.appendChild(row);
+    });
+
+    // Show the preview container
+    tableExtractionPreview.classList.remove("hidden");
+  }
+
+  function showTableExtractionResult(message, type) {
+    tableExtractionResultContainer.classList.remove("hidden");
+    tableExtractionResultContent.innerHTML = message;
+
+    // Remove all status classes
+    tableExtractionResultContent.classList.remove("success", "error", "info");
+
+    // Add appropriate class
+    if (type) {
+      tableExtractionResultContent.classList.add(type);
+    }
+
+    // Scroll to result
+    tableExtractionResultContainer.scrollIntoView({ behavior: "smooth" });
+  }
 });
-
-// This function would typically use a file dialog, but browsers restrict this for security
-// In a real application, you might need to use Electron or a backend solution
-function browseDirectory(inputId) {
-  // In a web-only environment, we can't directly access the file system
-  // So we'll just alert the user about this limitation
-  alert(
-    "Directory browsing is not available in a web browser due to security restrictions.\n\nPlease manually enter the full directory path."
-  );
-
-  // Focus on the input field for better UX
-  document.getElementById(inputId).focus();
-
-  // Note: In a desktop application using Electron or similar framework,
-  // you would implement actual directory browsing here
-}
 
 // Tab functionality
 function openTab(tabName) {

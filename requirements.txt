@@ -9,3 +9,6 @@ python-dotenv
 aiohttp
 tenacity
 PyPDF2
+urllib3
+requests
+pypdf

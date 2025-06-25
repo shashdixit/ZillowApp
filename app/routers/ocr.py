@@ -13,12 +13,12 @@ async def process_directory(input_dir: str = Form(...), output_dir: str = Form(.
     """
     Process all files in the input directory with OCR and save text files to the output directory.
     """
-    # Validate directories
-    if not os.path.exists(input_dir):
-        raise HTTPException(status_code=400, detail=f"Input directory does not exist: {input_dir}")
-    
+    # Validate directories    
     if not os.path.isdir(input_dir):
         raise HTTPException(status_code=400, detail=f"Input path is not a directory: {input_dir}")
+    
+    if not os.path.isdir(output_dir):
+        raise HTTPException(status_code=400, detail=f"Output path is not a directory: {output_dir}")
     
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document Processing Tool</title>
+    <title>Zillow App</title>
     <link
       rel="stylesheet"
       href="{{ url_for('static', path='/css/styles.css') }}"
@@ -23,6 +23,9 @@
         <button class="tab-btn" onclick="openTab('titleExtraction')">
           Title Extraction
         </button>
+        <button class="tab-btn" onclick="openTab('tableExtraction')">
+          Table Extraction
+        </button>
       </div>
 
       <div id="tifToPdf" class="tab-content active">
@@ -33,7 +36,10 @@
               <label for="inputDir">Input Directory:</label>
               <div class="input-group">
                 <input type="text" id="inputDir" name="input_dir" required />
-                <button type="button" onclick="browseDirectory('inputDir')">
+                <button
+                  type="button"
+                  onclick="alert('Write absolute path of directory in input field.')"
+                >
                   Browse
                 </button>
               </div>
@@ -43,7 +49,10 @@
               <label for="outputDir">Output Directory:</label>
               <div class="input-group">
                 <input type="text" id="outputDir" name="output_dir" required />
-                <button type="button" onclick="browseDirectory('outputDir')">
+                <button
+                  type="button"
+                  onclick="alert('Write absolute path of directory in input field.')"
+                >
                   Browse
                 </button>
               </div>
@@ -67,7 +76,10 @@
               <label for="ocrInputDir">Input Directory:</label>
               <div class="input-group">
                 <input type="text" id="ocrInputDir" name="input_dir" required />
-                <button type="button" onclick="browseDirectory('ocrInputDir')">
+                <button
+                  type="button"
+                  onclick="alert('Write absolute path of directory in input field.')"
+                >
                   Browse
                 </button>
               </div>
@@ -82,7 +94,10 @@
                   name="output_dir"
                   required
                 />
-                <button type="button" onclick="browseDirectory('ocrOutputDir')">
+                <button
+                  type="button"
+                  onclick="alert('Write absolute path of directory in input field.')"
+                >
                   Browse
                 </button>
               </div>
@@ -128,7 +143,7 @@
                 />
                 <button
                   type="button"
-                  onclick="browseDirectory('titleInputDir')"
+                  onclick="alert('Write absolute path of directory in input field.')"
                 >
                   Browse
                 </button>
@@ -146,7 +161,7 @@
                 />
                 <button
                   type="button"
-                  onclick="browseDirectory('titleOutputFile')"
+                  onclick="alert('Write absolute path of csv file in input field.')"
                 >
                   Browse
                 </button>
@@ -189,6 +204,73 @@
                 <tr>
                   <th>Filename</th>
                   <th>Title</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="tableExtraction" class="tab-content">
+        <div class="card">
+          <h2>Extract Data to Tables</h2>
+          <form id="tableExtractionForm">
+            <div class="form-group">
+              <label for="tableInputDir">Input Directory (PDFs):</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="tableInputDir"
+                  name="input_dir"
+                  required
+                />
+                <button
+                  type="button"
+                  onclick="alert('Write absolute path of directory in input field.')"
+                >
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tableOutputDir">Output Directory (CSVs):</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="tableOutputDir"
+                  name="output_dir"
+                  required
+                />
+                <button
+                  type="button"
+                  onclick="alert('Write absolute path of directory in input field.')"
+                >
+                  Browse
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="primary-btn">Extract Tables</button>
+          </form>
+        </div>
+
+        <div id="tableExtractionResult" class="result-container hidden">
+          <h3>Table Extraction Status</h3>
+          <div id="tableExtractionProgress" class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">0%</div>
+          </div>
+          <div id="tableExtractionResultContent"></div>
+          <div id="tableExtractionPreview" class="preview-container hidden">
+            <h4>Preview of Extracted Data</h4>
+            <table id="tablePreviewTable" class="preview-table">
+              <thead>
+                <tr>
+                  <th>Filename</th>
+                  <th>Data</th>
                 </tr>
               </thead>
               <tbody></tbody>

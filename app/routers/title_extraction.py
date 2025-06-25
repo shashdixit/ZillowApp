@@ -1,7 +1,6 @@
 from fastapi import APIRouter, HTTPException, Form, BackgroundTasks
 from fastapi.responses import JSONResponse
 import os
-import asyncio
 from app.services.title_extractor import TitleExtractor
 from dotenv import load_dotenv
 
@@ -33,7 +32,6 @@ async def extract_titles_background(task_id, input_dir, output_file, batch_size)
         # Get list of PDF files
         pdf_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir)
                      if f.lower().endswith('.pdf')]
-        num_files = len(pdf_files)
 
         if not pdf_files:
             task_status[task_id] = {"status": "failed", "progress": 0, "message": f"No PDF files found in {input_dir}"}
@@ -63,9 +61,6 @@ async def extract_titles(
     Extract titles from all PDF files in the input directory using LLM.
     """
     # Validate directories
-    if not os.path.exists(input_dir):
-        raise HTTPException(status_code=400, detail=f"Input directory does not exist: {input_dir}")
-
     if not os.path.isdir(input_dir):
         raise HTTPException(status_code=400, detail=f"Input path is not a directory: {input_dir}")
 
