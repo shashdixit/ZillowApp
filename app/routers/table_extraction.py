@@ -34,13 +34,12 @@ async def extract_tables_background(task_id: str, input_dir: str, output_dir: st
         task_status[task_id].message = "Initialized table extraction service..."
 
         # Run the extraction
-        results = await table_extraction_service.extract_all_tables(task_id, task_status, input_dir, output_dir)
+        await table_extraction_service.extract_all_tables(task_id, task_status, input_dir, output_dir)
 
         # Update status with completion
         task_status[task_id].status = "completed"
         task_status[task_id].progress = 100
         task_status[task_id].message = f"Extraction completed. Check output directory for results."
-        task_status[task_id].results = results[:10] if results else []  # Preview first 10 results
 
     except Exception as e:
         task_status[task_id].status = "failed"

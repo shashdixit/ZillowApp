@@ -10,10 +10,42 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+ALL_COLUMN_NAMES = [
+    "S. No.",
+    "File Type",
+    "File Name",
+    "Page Count",
+    "FIPS",
+    "County",
+    "State",
+    "Batch",
+    "Delivery",
+    "Segregation VA Allocation",
+    "Segregation VA Status",
+    "Segregation QA Status",
+    "Doc Title",
+    "Data Class",
+    "OCR Allocation",
+    "Valid/Invalid",
+    "Valid/Invalid Allocation",
+    "OCR Status",
+    "DC Allocation",
+    "DC Status",
+    "DC Completion Date",
+    "VA Name",
+    "VA Status",
+    "VA RWK Status",
+    "QC Allocation",
+    "QC Alloc. Date",
+    "QA comments-Valid check",
+    "Comments"
+]
+
 class TitleExtractor:
     def __init__(self, llm_endpoint, llm_token):
         self.llm_endpoint = llm_endpoint
         self.llm_token = llm_token
+    
 
     @staticmethod
     def encode_first_page(pdf_path):
@@ -142,7 +174,7 @@ class TitleExtractor:
             logger.error(f"Error querying LLM: {e}")
             raise
 
-    async def process_pdf(self, session, pdf_path):
+    async def process_pdf(self, session, pdf_path, results_list):
         """Process a single PDF file and return its title and FIPS code."""
         try:
             # Encode the PDF file
@@ -152,18 +184,30 @@ class TitleExtractor:
 
             # Query LLM to extract title and FIPS code
             title, fips_code = await self.query_llm_with_pdf(session, pdf_base64)
-            return os.path.basename(pdf_path), title, fips_code
+            file_name_without_extension = os.path.basename(pdf_path).split('.')[0]
+            
+            output_row = []
+            for column_name in ALL_COLUMN_NAMES:
+                if column_name == "File Name":
+                    output_row.append(file_name_without_extension)
+                elif column_name == "FIPS":
+                    output_row.append(fips_code)
+                elif column_name == "Doc Title":
+                    output_row.append(title)
+                else:
+                    output_row.append("")
+
+            # Append the row to the results list
+            results_list.append(output_row)
 
         except Exception as e:
             logger.error(f"Error processing {pdf_path}: {e}")
             return os.path.basename(pdf_path), f"Error: {str(e)}", "Error"
 
-    async def process_batch(self, session, pdf_paths, task_id, task_status, total_files, batch_start_index, batch_size=5):
+    async def process_batch(self, session, pdf_paths, task_id, task_status, total_files, batch_start_index, results_list, batch_size=5):
         """Process a batch of PDF files concurrently."""
-        results = []
-        tasks = [self.process_pdf(session, path) for path in pdf_paths]
-        batch_results = await asyncio.gather(*tasks)
-        results.extend(batch_results)
+        tasks = [self.process_pdf(session, path, results_list) for path in pdf_paths]
+        await asyncio.gather(*tasks)
         logger.info(f"Processed batch starting from index {batch_start_index//batch_size + 1}/{(total_files + batch_size - 1)//batch_size}")
 
         # Calculate and update progress
@@ -171,8 +215,6 @@ class TitleExtractor:
         progress = int((processed_count / total_files) * 95)  # Scale to 95% to leave room for completion
         task_status[task_id]["progress"] = progress
         task_status[task_id]["message"] = f"Processed {processed_count}/{total_files} files ({progress}%)"
-
-        return results
 
     async def extract_titles_from_directory(self, pdf_files, output_csv, batch_size, task_id, task_status):
         """Extract titles and FIPS codes from all PDF files in a directory."""
@@ -184,15 +226,14 @@ class TitleExtractor:
         async with aiohttp.ClientSession() as session:
             for i in range(0, total_files, batch_size):
                 batch = pdf_files[i:i + batch_size]
-                results = await self.process_batch(session, batch, task_id, task_status, total_files, i, batch_size)
-                all_results.extend(results)
+                await self.process_batch(session, batch, task_id, task_status, total_files, i, all_results, batch_size)
 
         # Write results to CSV if output_csv is provided
         if output_csv:
             with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
                 csv_writer = csv.writer(csvfile)
-                csv_writer.writerow(["Filename", "Title", "FIPS"])
-                csv_writer.writerows([(filename, title, fips) for filename, title, fips in all_results])
+                csv_writer.writerow(ALL_COLUMN_NAMES)
+                csv_writer.writerows(all_results)
             logger.info(f"Results saved to {output_csv}")
 
         return all_results

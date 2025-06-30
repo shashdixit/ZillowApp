@@ -12,6 +12,7 @@ async def process_buyer_mail_addresses(filename, session, system_prompt, message
         return None
 
     match = re.search(r'\d+', filename)
+    doc_no = match.group() if match else None
 
     pdf_base64 = encode_pdf(pdf_path)
 
@@ -31,7 +32,9 @@ async def process_buyer_mail_addresses(filename, session, system_prompt, message
 
         for column_name in all_column_names:
             if column_name == 'recording_document_number':
-                output_row.append(match.group())
+                if parsed_results.get('fips', "") == '40003':
+                    doc_no = doc_no[:4] + '-' + doc_no[4:]
+                output_row.append(doc_no)
             else:
                 if column_name == 'buyer_mail_street_suffix':
                     output_row.append(get_street_suffix(parsed_results.get("buyer_mail_full_street_address", "")))

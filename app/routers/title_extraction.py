@@ -44,8 +44,7 @@ async def extract_titles_background(task_id, input_dir, output_file, batch_size)
         task_status[task_id] = {
             "status": "completed",
             "progress": 100,
-            "message": f"Extraction completed. Processed {len(results)} files.",
-            "results": results[:10]  # Include first 10 results as preview
+            "message": f"Extraction completed. Processed {len(results)} files."
         }
     except Exception as e:
         task_status[task_id] = {"status": "failed", "progress": 0, "message": f"Error: {str(e)}"}

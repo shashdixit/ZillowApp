@@ -19,12 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const titleExtractionProgress = document.getElementById(
     "titleExtractionProgress"
   );
-  const titleExtractionPreview = document.getElementById(
-    "titleExtractionPreview"
-  );
-  const titlePreviewTable = document
-    .getElementById("titlePreviewTable")
-    .querySelector("tbody");
 
   const tableExtractionForm = document.getElementById("tableExtractionForm");
   const tableExtractionResultContainer = document.getElementById(
@@ -36,12 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const tableExtractionProgress = document.getElementById(
     "tableExtractionProgress"
   );
-  const tableExtractionPreview = document.getElementById(
-    "tableExtractionPreview"
-  );
-  const tablePreviewTable = document
-    .getElementById("tablePreviewTable")
-    .querySelector("tbody");
 
   // TIF to PDF conversion form handler
   directoryForm.addEventListener("submit", async function (e) {
@@ -239,11 +227,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "success"
           );
 
-          // Show preview if results are available
-          if (data.results && data.results.length > 0) {
-            showTitlePreview(data.results);
-          }
-
           return; // Stop polling
         } else if (data.status === "failed") {
           showTitleExtractionResult(`Error: ${data.message}`, "error");
@@ -277,78 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
     progressText.textContent = `${percentage}%`;
   }
 
-  // Function to show title preview
-  function showTitlePreview(results) {
-    // Clear previous results
-    titlePreviewTable.innerHTML = "";
-
-    // Add each result to the table
-    results.forEach((result) => {
-      const row = document.createElement("tr");
-
-      const filenameCell = document.createElement("td");
-      filenameCell.textContent = result[0]; // Filename
-      row.appendChild(filenameCell);
-
-      const titleCell = document.createElement("td");
-      titleCell.textContent = result[1]; // Title
-      row.appendChild(titleCell);
-
-      titlePreviewTable.appendChild(row);
-    });
-
-    // Show the preview container
-    titleExtractionPreview.classList.remove("hidden");
-  }
-
-  function showConversionResult(message, type) {
-    conversionResultContainer.classList.remove("hidden");
-    conversionResultContent.innerHTML = message;
-
-    // Remove all status classes
-    conversionResultContent.classList.remove("success", "error", "info");
-
-    // Add appropriate class
-    if (type) {
-      conversionResultContent.classList.add(type);
-    }
-
-    // Scroll to result
-    conversionResultContainer.scrollIntoView({ behavior: "smooth" });
-  }
-
-  function showOcrResult(message, type) {
-    ocrResultContainer.classList.remove("hidden");
-    ocrResultContent.innerHTML = message;
-
-    // Remove all status classes
-    ocrResultContent.classList.remove("success", "error", "info");
-
-    // Add appropriate class
-    if (type) {
-      ocrResultContent.classList.add(type);
-    }
-
-    // Scroll to result
-    ocrResultContainer.scrollIntoView({ behavior: "smooth" });
-  }
-
-  function showTitleExtractionResult(message, type) {
-    titleExtractionResultContainer.classList.remove("hidden");
-    titleExtractionResultContent.innerHTML = message;
-
-    // Remove all status classes
-    titleExtractionResultContent.classList.remove("success", "error", "info");
-
-    // Add appropriate class
-    if (type) {
-      titleExtractionResultContent.classList.add(type);
-    }
-
-    // Scroll to result
-    titleExtractionResultContainer.scrollIntoView({ behavior: "smooth" });
-  }
-  
+  // Table Extraction form handler
   tableExtractionForm.addEventListener("submit", async function (e) {
     e.preventDefault();
 
@@ -427,11 +339,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "success"
           );
 
-          // Show preview if results are available
-          if (data.results && data.results.length > 0) {
-            showTablePreview(data.results);
-          }
-
           return; // Stop polling
         } else if (data.status === "failed") {
           showTableExtractionResult(`Error: ${data.message}`, "error");
@@ -465,28 +372,52 @@ document.addEventListener("DOMContentLoaded", function () {
     progressText.textContent = `${percentage}%`;
   }
 
-  // Function to show table preview
-  function showTablePreview(results) {
-    // Clear previous results
-    tablePreviewTable.innerHTML = "";
+  function showConversionResult(message, type) {
+    conversionResultContainer.classList.remove("hidden");
+    conversionResultContent.innerHTML = message;
 
-    // Add each result to the table
-    results.forEach((result) => {
-      const row = document.createElement("tr");
+    // Remove all status classes
+    conversionResultContent.classList.remove("success", "error", "info");
 
-      const filenameCell = document.createElement("td");
-      filenameCell.textContent = result[0]; // Filename
-      row.appendChild(filenameCell);
+    // Add appropriate class
+    if (type) {
+      conversionResultContent.classList.add(type);
+    }
 
-      const dataCell = document.createElement("td");
-      dataCell.textContent = result[1]; // Data
-      row.appendChild(dataCell);
+    // Scroll to result
+    conversionResultContainer.scrollIntoView({ behavior: "smooth" });
+  }
 
-      tablePreviewTable.appendChild(row);
-    });
+  function showOcrResult(message, type) {
+    ocrResultContainer.classList.remove("hidden");
+    ocrResultContent.innerHTML = message;
 
-    // Show the preview container
-    tableExtractionPreview.classList.remove("hidden");
+    // Remove all status classes
+    ocrResultContent.classList.remove("success", "error", "info");
+
+    // Add appropriate class
+    if (type) {
+      ocrResultContent.classList.add(type);
+    }
+
+    // Scroll to result
+    ocrResultContainer.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function showTitleExtractionResult(message, type) {
+    titleExtractionResultContainer.classList.remove("hidden");
+    titleExtractionResultContent.innerHTML = message;
+
+    // Remove all status classes
+    titleExtractionResultContent.classList.remove("success", "error", "info");
+
+    // Add appropriate class
+    if (type) {
+      titleExtractionResultContent.classList.add(type);
+    }
+
+    // Scroll to result
+    titleExtractionResultContainer.scrollIntoView({ behavior: "smooth" });
   }
 
   function showTableExtractionResult(message, type) {

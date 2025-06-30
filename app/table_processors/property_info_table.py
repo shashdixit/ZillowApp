@@ -8,6 +8,7 @@ async def process_property_info_table(filename, session, system_prompt, message_
     print(f"Processing Property Info Table for {filename}...")
 
     match = re.search(r'\d+', filename)
+    doc_no = match.group() if match else None
 
     pdf_base64 = encode_pdf(pdf_path)
 
@@ -39,7 +40,9 @@ async def process_property_info_table(filename, session, system_prompt, message_
             output_row = []
             for column_name in all_column_names:
                 if column_name == 'recording_document_number':
-                    output_row.append(match.group())
+                    if parsed_results.get('fips', "") == '40003':
+                        doc_no = doc_no[:4] + '-' + doc_no[4:]
+                    output_row.append(doc_no)
                 elif column_name in ["fips","recording_book_number","recording_page_number","data_class_stnd_code","recording_date"]:
                     output_row.append(parsed_results.get(column_name, ""))
                 elif column_name in ["raw_legal_lot", "legal_lot", "raw_legal_block", "legal_block", "raw_legal_subdivision_name", "legal_subdivision_name", "legal_condo_project_pud_dev_name", "legal_building_number", "raw_legal_unit", "legal_unit", "raw_legal_section", "legal_section", "raw_legal_phase", "legal_phase", "raw_legal_tract", "legal_tract", "raw_legal_district", "legal_district", "raw_legal_municipality", "legal_municipality", "raw_legal_city", "legal_city", "raw_legal_township", "legal_township", "raw_legal_sec_twn_rng_mer", "legal_sec_twn_rng_mer", "raw_legal_recorders_map_reference", "legal_recorders_map_reference", "raw_legal_description", "legal_description"] and parsed_results.get("data_class_stnd_code") == 'M':

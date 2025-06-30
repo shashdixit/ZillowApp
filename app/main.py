@@ -21,7 +21,3 @@ app.include_router(table_extraction.router)
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("app.main:app", host="x", port=8080, reload=True)

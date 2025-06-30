@@ -9,7 +9,7 @@ async def process_main_table(filename, session, system_prompt, message_prompt, a
     print(f"Processing Main Table for {filename}...")
 
     match = re.search(r'\d+', filename)
-    doc_no = match.group()
+    doc_no = match.group() if match else None
 
     pdf_base64 = encode_pdf(pdf_path)
 
@@ -21,7 +21,7 @@ async def process_main_table(filename, session, system_prompt, message_prompt, a
 
         for column_name in all_column_names:
             if column_name == 'recording_document_number':
-                if parsed_results.get('county', "").upper() == 'ALFALFA':
+                if parsed_results.get('fips', "") == '40003':
                     doc_no = doc_no[:4] + '-' + doc_no[4:]
                 output_row.append(doc_no)
             elif column_name in ["raw_buyer_vesting_stnd_code","buyer_vesting_stnd_code","raw_sales_price_amount","sales_price_amount","sales_price_amount_stnd_code","occupancy_status_stnd_code"] and parsed_results.get("data_class_stnd_code") == 'M':

@@ -98,7 +98,6 @@ class TableExtractionService:
         self.OUTPUT_DIRECTORY = output_dir
         os.makedirs(self.OUTPUT_DIRECTORY, exist_ok=True)
 
-        results = []
         async with aiohttp.ClientSession() as session:
             pdf_files = [filename for filename in os.listdir(self.PDF_DIRECTORY) if filename.endswith(".pdf")]
             num_tables = 7  # Number of tables being processed
@@ -110,40 +109,40 @@ class TableExtractionService:
             task_status[task_id].progress = int(current_table_progress)
             task_status[task_id].message = f"Starting table extraction: {int(current_table_progress)}%"
 
-            # await self.process_table(
-            #     "main", pdf_files, session, process_main_table, main_table_system_prompt, main_table_message_prompt, main_table_all_column_names, task_id, task_status, progress_per_table
-            # )
-            # current_table_progress += progress_per_table
-            # task_status[task_id].progress = int(min(current_table_progress, 95))
-            # task_status[task_id].message = f"Processing property_info: {task_status[task_id].progress}%"
+            await self.process_table(
+                "main", pdf_files, session, process_main_table, main_table_system_prompt, main_table_message_prompt, main_table_all_column_names, task_id, task_status, progress_per_table
+            )
+            current_table_progress += progress_per_table
+            task_status[task_id].progress = int(min(current_table_progress, 95))
+            task_status[task_id].message = f"Processing property_info: {task_status[task_id].progress}%"
 
-            # await self.process_table(
-            #     "property_info", pdf_files, session, process_property_info_table, property_info_system_prompt, property_info_message_prompt, property_info_all_column_names, task_id, task_status, progress_per_table
-            # )
-            # current_table_progress += progress_per_table
-            # task_status[task_id].progress = int(min(current_table_progress, 95))
-            # task_status[task_id].message = f"Processing buyer_data: {task_status[task_id].progress}%"
+            await self.process_table(
+                "property_info", pdf_files, session, process_property_info_table, property_info_system_prompt, property_info_message_prompt, property_info_all_column_names, task_id, task_status, progress_per_table
+            )
+            current_table_progress += progress_per_table
+            task_status[task_id].progress = int(min(current_table_progress, 95))
+            task_status[task_id].message = f"Processing buyer_data: {task_status[task_id].progress}%"
 
-            # await self.process_tables(
-            #     pdf_files, session, process_buyer_data, buyer_data_system_prompt, buyer_data_message_prompt, buyer_names_all_column_names, buyer_desc_all_column_names, task_id, task_status, progress_per_table
-            # )
-            # current_table_progress += progress_per_table
-            # task_status[task_id].progress = int(min(current_table_progress, 95))
-            # task_status[task_id].message = f"Processing buyer_addresses: {task_status[task_id].progress}%"
+            await self.process_tables(
+                pdf_files, session, process_buyer_data, buyer_data_system_prompt, buyer_data_message_prompt, buyer_names_all_column_names, buyer_desc_all_column_names, task_id, task_status, progress_per_table
+            )
+            current_table_progress += progress_per_table
+            task_status[task_id].progress = int(min(current_table_progress, 95))
+            task_status[task_id].message = f"Processing buyer_addresses: {task_status[task_id].progress}%"
 
-            # await self.process_table(
-            #     "buyer_addresses", pdf_files, session, process_buyer_mail_addresses, buyer_mail_address_system_prompt, buyer_mail_address_message_prompt, buyer_mail_address_all_column_names, task_id, task_status, progress_per_table
-            # )
-            # current_table_progress += progress_per_table
-            # task_status[task_id].progress = int(min(current_table_progress, 95))
-            # task_status[task_id].message = f"Processing seller_names: {task_status[task_id].progress}%"
+            await self.process_table(
+                "buyer_addresses", pdf_files, session, process_buyer_mail_addresses, buyer_mail_address_system_prompt, buyer_mail_address_message_prompt, buyer_mail_address_all_column_names, task_id, task_status, progress_per_table
+            )
+            current_table_progress += progress_per_table
+            task_status[task_id].progress = int(min(current_table_progress, 95))
+            task_status[task_id].message = f"Processing seller_names: {task_status[task_id].progress}%"
 
-            # await self.process_table(
-            #     "seller_names", pdf_files, session, process_seller_names, seller_names_system_prompt, seller_names_message_prompt, seller_names_all_column_names, task_id, task_status, progress_per_table
-            # )
-            # current_table_progress += progress_per_table
-            # task_status[task_id].progress = int(min(current_table_progress, 95))
-            # task_status[task_id].message = f"Processing borrower_names: {task_status[task_id].progress}%"
+            await self.process_table(
+                "seller_names", pdf_files, session, process_seller_names, seller_names_system_prompt, seller_names_message_prompt, seller_names_all_column_names, task_id, task_status, progress_per_table
+            )
+            current_table_progress += progress_per_table
+            task_status[task_id].progress = int(min(current_table_progress, 95))
+            task_status[task_id].message = f"Processing borrower_names: {task_status[task_id].progress}%"
 
             await self.process_table(
                 "borrower_names", pdf_files, session, process_borrower_names, borrower_names_system_prompt, borrower_names_message_prompt, borrower_names_all_column_names, task_id, task_status, progress_per_table
@@ -158,5 +157,3 @@ class TableExtractionService:
 
         task_status[task_id].progress = 100
         task_status[task_id].message = "All tables processed."
-
-        return results

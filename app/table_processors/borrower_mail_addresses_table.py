@@ -11,14 +11,14 @@ async def process_borrower_mail_addresses(filename, session, system_prompt, mess
 
     # Extract recording document number from filename
     match = re.search(r'\d+', filename)
-    recording_document_number = match.group() if match else None
+    doc_no = match.group() if match else None
 
     property_info_csv_path = os.path.join("app/Output Files", "property_info.csv")
 
     if(classify_document(pdf_path) == 'D'):
         return None
-    elif property_info_csv_path and recording_document_number:
-        if check_property_address_in_csv(property_info_csv_path, recording_document_number):
+    elif property_info_csv_path and doc_no:
+        if check_property_address_in_csv(property_info_csv_path, doc_no):
             return None  
 
     pdf_base64 = encode_pdf(pdf_path)
@@ -39,7 +39,9 @@ async def process_borrower_mail_addresses(filename, session, system_prompt, mess
 
         for column_name in all_column_names:
             if column_name == 'recording_document_number':
-                output_row.append(match.group())
+                if parsed_results.get('fips', "") == '40003':
+                    doc_no = doc_no[:4] + '-' + doc_no[4:]
+                output_row.append(doc_no)
             else:
                 if column_name == 'borrower_mail_street_suffix':
                     output_row.append(get_street_suffix(parsed_results.get("borrower_mail_full_street_address", "")))

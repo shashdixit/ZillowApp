@@ -12,6 +12,7 @@ async def process_seller_names(filename, session, system_prompt, message_prompt,
         return None
 
     match = re.search(r'\d+', filename)
+    doc_no = match.group() if match else None
 
     pdf_base64 = encode_pdf(pdf_path)
 
@@ -48,7 +49,9 @@ async def process_seller_names(filename, session, system_prompt, message_prompt,
             output_row.append(parsed_results.get("index_key", ""))
             output_row.append(parsed_results.get("data_class_stnd_code", ""))
             output_row.append(parsed_results.get("recording_date", ""))
-            output_row.append(match.group() if match else "")  # recording_document_number
+            if parsed_results.get('fips', "") == '40003':
+                doc_no = doc_no[:4] + '-' + doc_no[4:]
+            output_row.append(doc_no)
             output_row.append(parsed_results.get("recording_book_number", ""))
             output_row.append(parsed_results.get("recording_page_number", ""))
 
