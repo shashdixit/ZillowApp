@@ -17,9 +17,6 @@ async def convert_directory(input_dir: str = Form(...), output_dir: str = Form(.
     if not os.path.isdir(input_dir):
         raise HTTPException(status_code=400, detail=f"Input path is not a directory: {input_dir}")
     
-    if not os.path.isdir(output_dir):
-        raise HTTPException(status_code=400, detail=f"Ouptut path is not a directory: {output_dir}")
-    
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
     

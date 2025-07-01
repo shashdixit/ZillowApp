@@ -58,9 +58,9 @@ async def extract_all_tables(
     # Validate directories
     if not os.path.isdir(input_dir):
         raise HTTPException(status_code=400, detail=f"Input path is not a directory: {input_dir}")
-
-    if not os.path.isdir(output_dir):
-        raise HTTPException(status_code=400, detail=f"Output path is not a directory: {output_dir}")
+    
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
 
     # Generate a task ID
     task_id = f"task_{len(task_status) + 1}"
