@@ -13,25 +13,34 @@ Here is the list of all properties with specified conditions to help finding the
 
 - fips
 { Populate this field based on county name from below table-
-  COUNTY NAME FIPS CODE
-    Clinton  26037
-    Whitley  21235
-    Clark  21049
-    Mccracken  21145
-    Bullitt  21029
-    Elliott  21063
-    Wolfe  21237
+  COUNTY NAME  FIPS CODE
     Alfalfa  40003
+    Atoka  40005
     Beaver  40007
+    Bullitt  21029
+    Butler  21031
+    Carroll  21041
     Cimarron  40025
+    Clark  21049
+    Clinton  26037
     Coal  40029
     Dewey  40043
+    Elliott  21063
     Ellis  40045
+    Gallatin  21077
     Greer  40055
     Harper  40059
+    Hughes  40063
     Jefferson  40067
+    Lake  41037
+    Mccracken  21145
+    Pushmataha  40127
     Roger Mills  40129
-  If county is not from above then leave this empty. }
+    Texas  40139
+    Todd  21219
+    Whitley  21235
+    Wolfe  21237
+  IMPORTANT: Populate FIPS code from given table for county mentioned in document. Do not leave this empty as this field is must to populate. }
 
 - index_key
 { Generate index_key as “character varying NOT NULL” and populate each record's tables with a unique character key.
@@ -47,6 +56,7 @@ Here is the list of all properties with specified conditions to help finding the
     Michigan  MI
     Kentucky  KY
     Oklahoma  OK
+    Oregon  OR
   If not found from above then fill whole state name in capital letters. }
 
 - raw_county
@@ -214,8 +224,8 @@ Here is the list of all properties with specified conditions to help finding the
 - state_transfer_tax	
 { First check the county of document, then follow according to rules mentioned below foe specific counties
   For 'Clinton' county, mentioned below County Transfer tax with "-S" after value in first page.
-  For county in ['Clark', 'Mccracken', 'Bullitt'], look in last page and populate the value written after 'TRANSFER TAX' keyword in this field. Do not take value written after 'TOTAL FEES' keyword. 
-  For 'Alfalfa', 'Beaver', 'Cimarron', 'Coal', 'Dewey', 'Ellis', 'Greer', 'Harper', 'Jefferson' and 'Roger Mills' county, look in last page and populate the value written after 'Doc' keyword in this field. Do not take value written after 'Fee' keyword. 
+  For county in ['Clark', 'Mccracken', 'Bullitt', 'Carroll', 'Gallatin', 'Todd'], look in last page and populate the value written after 'TRANSFER TAX' keyword in this field. Do not take value written after 'TOTAL FEES' keyword. 
+  For 'Alfalfa', 'Beaver', 'Cimarron', 'Coal', 'Dewey', 'Ellis', 'Greer', 'Harper', 'Atoka', 'Hughes', 'Pushmataha', 'Texas', 'Jefferson' and 'Roger Mills' county, look in last page and populate the value written after 'Doc' keyword in this field. Do not take value written after 'Fee' keyword. 
   For all other counties, leave this field as empty.
   value should start with '$' and with two digits after decimal. Put commas according to international format.
   Leave it empty if not found. }
@@ -223,7 +233,7 @@ Here is the list of all properties with specified conditions to help finding the
 - total_transfer_tax	
 { First check the county of document, then follow according to rules mentioned below foe specific counties
   For 'Clinton' county, Populate this field with the sum of the County and State Transfer Taxes.
-  For 'Whitley' county, look in last page and populate the value written after 'TRANSFER TAX' keyword in this field. Do not take value written after 'TOTAL FEES' keyword. 
+  For 'Whitley', 'Butler' county, look in last page and populate the value written after 'TRANSFER TAX' keyword in this field. Do not take value written after 'TOTAL FEES' keyword. 
   For 'Wolfe' county, look in last page and populate the value written after 'DEED TAX' keyword in this field.
   For all other counties, leave this field as empty.
   value should start with '$' and with two digits after decimal. Put commas according to international format.

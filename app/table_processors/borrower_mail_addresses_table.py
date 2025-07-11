@@ -1,5 +1,4 @@
 import os
-import re
 import csv
 from app.classify import classify_document
 from app.llm_utils import encode_pdf, query_llm, parse_csv_response
@@ -9,9 +8,15 @@ async def process_borrower_mail_addresses(filename, session, system_prompt, mess
     pdf_path = os.path.join(PDF_DIRECTORY, filename)
     print(f"Processing Borrower Mail Addresses Table for {filename}...")
 
+    filename_ = os.path.splitext(filename)[0]
+
     # Extract recording document number from filename
-    match = re.search(r'\d+', filename)
-    doc_no = match.group() if match else None
+    if filename_.isdigit(): # Exceptions - Clinton
+        doc_no = filename_
+    elif filename_.startswith('2025_'):
+        doc_no = filename_[:4] + filename_[5:]
+    else:
+        doc_no = filename_[:-2]
 
     property_info_csv_path = os.path.join("app/Output Files", "property_info.csv")
 
@@ -39,8 +44,10 @@ async def process_borrower_mail_addresses(filename, session, system_prompt, mess
 
         for column_name in all_column_names:
             if column_name == 'recording_document_number':
-                if parsed_results.get('fips', "") == '40003':
+                if parsed_results.get('fips', "") in ['40003', '40005', '40007', '40025', '40029', '40043', '40055', '40059', '40063', '40127', '40139', '40129', '41037']:
                     doc_no = doc_no[:4] + '-' + doc_no[4:]
+                elif parsed_results.get('fips', "") == '40067':
+                    doc_no = 'W-' + doc_no[:6]
                 output_row.append(doc_no)
             else:
                 if column_name == 'borrower_mail_street_suffix':

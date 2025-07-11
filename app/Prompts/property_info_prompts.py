@@ -13,25 +13,34 @@ Here is the list of all properties with specified conditions to help finding the
 
 - fips
 { Populate this field based on county name from below table-
-  COUNTY NAME FIPS CODE
-    Clinton  26037
-    Whitley  21235
-    Clark  21049
-    Mccracken  21145
-    Bullitt  21029
-    Elliott  21063
-    Wolfe  21237
+  COUNTY NAME  FIPS CODE
     Alfalfa  40003
+    Atoka  40005
     Beaver  40007
+    Bullitt  21029
+    Butler  21031
+    Carroll  21041
     Cimarron  40025
+    Clark  21049
+    Clinton  26037
     Coal  40029
     Dewey  40043
+    Elliott  21063
     Ellis  40045
+    Gallatin  21077
     Greer  40055
     Harper  40059
+    Hughes  40063
     Jefferson  40067
+    Lake  41037
+    Mccracken  21145
+    Pushmataha  40127
     Roger Mills  40129
-  If county is not from above then leave this empty. }
+    Texas  40139
+    Todd  21219
+    Whitley  21235
+    Wolfe  21237
+  IMPORTANT: Populate FIPS code from given table for county mentioned in document. Do not leave this empty as this field is must to populate. }
 
 - data_class_stnd_code
 { Populate = 'D' if Document title belongs to 'Deed'.
@@ -56,14 +65,13 @@ Here is the list of all properties with specified conditions to help finding the
 { The APN is a 10 to 14 digit number separated into segments with dashes.
   This is labelled with following keywords in document - APN, PIN, Parcel, Parcel ID, Unlabeled (vertically written on left margin of page), TAX ID, Tax Parcel ID.
   Capture all unique apn(s) from document from all possible places and populate here with comma separated.
-  Below are specified formats for all counties to help search for apn numbers in document.
+  Below are specified formats for some counties to help search for apn numbers in document.
   For county 'Clinton'
     This is the default format of this number - 999-999-999-999-99 (Predominant Format)
     But only exception is for legal city of East Lancing, it's format is 19-99-99-99-999-999 (Non-Predominant Format)
   For county 'Clark'
     This is the default format of this number - 999-9999-999-99 (Predominant Format)
-  For counties 'Mccracken', 'Elliott' and 'Wolfe'
-    Predominated Formats: 
+  For counties 'Mccracken', 'Elliott', 'Butler' and 'Wolfe'
     999-99-99-999
     999-99-99-999.99
   For county 'Bullitt'
@@ -73,7 +81,7 @@ Here is the list of all properties with specified conditions to help finding the
   For county 'Alfalfa'
     020000999
     If less than 9 digits is reported for 'Alfalfa' county, add leading "02" followed by zero(s), and conform to a 9 digit format.
-  For county 'Beaver', 'Coal', 'Greer' and 'Roger Mills'
+  For county 'Beaver', 'Coal', 'Greer', 'Atoka', 'Hughes' and 'Roger Mills'
     "9999-99-99X-XXX-9-X99-99
     X = Alpha or Numeric
   For county 'Cimarron'
@@ -91,6 +99,12 @@ Here is the list of all properties with specified conditions to help finding the
   For county 'Jefferson'
     340000999
     If less than 9 digits is reported for 'Jefferson' county, add leading "34" followed by zero(s), and conform to a 9 digit format.
+  For county 'Pushmataha'
+    649999999
+    If less than 9 digits is reported for 'Pushmataha' county, add leading "64" followed by zero(s), and conform to a 9 digit format.
+  For county 'Texas'
+    709999999
+    If less than 9 digits is reported for 'Texas' county, add leading "70" followed by zero(s), and conform to a 9 digit format.
   Format all found apn(s) and populate here as comma separated.
   If Assessor parcel number is split from any main parcel, then please do not capture main parcel number. For example: If mentioned, Tax Parcel ID: 040-016-300-010-15 (Split 1999 from # 040-016-300-010-00) then capture only 040-016-300-010-15 and not other one.
   If the keyword 'through' is found in APN you need to increase the seq up to the limit, max limit = 100. Populate 100 records for this document and 100 apns should be populated in all these fields.

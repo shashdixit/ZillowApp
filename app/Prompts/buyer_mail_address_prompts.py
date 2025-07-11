@@ -13,25 +13,34 @@ Here is the list of all properties with specified conditions to help finding the
 
 - fips
 { Populate this field based on county name from below table-
-  COUNTY NAME FIPS CODE
-    Clinton  26037
-    Whitley  21235
-    Clark  21049
-    Mccracken  21145
-    Bullitt  21029
-    Elliott  21063
-    Wolfe  21237
+  COUNTY NAME  FIPS CODE
     Alfalfa  40003
+    Atoka  40005
     Beaver  40007
+    Bullitt  21029
+    Butler  21031
+    Carroll  21041
     Cimarron  40025
+    Clark  21049
+    Clinton  26037
     Coal  40029
     Dewey  40043
+    Elliott  21063
     Ellis  40045
+    Gallatin  21077
     Greer  40055
     Harper  40059
+    Hughes  40063
     Jefferson  40067
+    Lake  41037
+    Mccracken  21145
+    Pushmataha  40127
     Roger Mills  40129
-  If county is not from above then leave this empty. }
+    Texas  40139
+    Todd  21219
+    Whitley  21235
+    Wolfe  21237
+  IMPORTANT: Populate FIPS code from given table for county mentioned in document. Do not leave this empty as this field is must to populate. }
 
 - data_class_stnd_code
 { Populate = 'D' if Document title belongs to 'Deed'.

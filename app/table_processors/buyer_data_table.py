@@ -1,5 +1,4 @@
 import os
-import re
 from app.classify import classify_document
 from app.llm_utils import encode_pdf, query_llm, parse_csv_response
 
@@ -11,8 +10,15 @@ async def process_buyer_data(filename, session, system_prompt, message_prompt, a
     if(classify_document(pdf_path) == 'M'):
         return None, None
 
-    match = re.search(r'\d+', filename)
-    doc_no = match.group() if match else None
+    filename_ = os.path.splitext(filename)[0]
+
+    # Extract recording document number from filename
+    if filename_.isdigit(): # Exceptions - Clinton
+        doc_no = filename_
+    elif filename_.startswith('2025_'):
+        doc_no = filename_[:4] + filename_[5:]
+    else:
+        doc_no = filename_[:-2]
 
     pdf_base64 = encode_pdf(pdf_path)
 
@@ -42,6 +48,11 @@ async def process_buyer_data(filename, session, system_prompt, message_prompt, a
         j = 0
         flag = 1
 
+        if parsed_results.get('fips', "") in ['40003', '40005', '40007', '40025', '40029', '40043', '40055', '40059', '40063', '40127', '40139', '40129', '41037']:
+            doc_no = doc_no[:4] + '-' + doc_no[4:]
+        elif parsed_results.get('fips', "") == '40067':
+            doc_no = 'W-' + doc_no[:6]
+
         # Combine and write rows
         while i + j < num_names:
             # Buyer Names data
@@ -53,8 +64,6 @@ async def process_buyer_data(filename, session, system_prompt, message_prompt, a
             buyer_names_row.append(parsed_results.get("index_key", ""))
             buyer_names_row.append(parsed_results.get("data_class_stnd_code", ""))
             buyer_names_row.append(parsed_results.get("recording_date", ""))
-            if parsed_results.get('fips', "") == '40003':
-                doc_no = doc_no[:4] + '-' + doc_no[4:]
             buyer_names_row.append(doc_no)
             buyer_names_row.append(parsed_results.get("recording_book_number", ""))
             buyer_names_row.append(parsed_results.get("recording_page_number", ""))
@@ -99,8 +108,6 @@ async def process_buyer_data(filename, session, system_prompt, message_prompt, a
             buyer_desc_row.append(parsed_results.get("index_key", ""))
             buyer_desc_row.append(parsed_results.get("data_class_stnd_code", ""))
             buyer_desc_row.append(parsed_results.get("recording_date", ""))
-            if parsed_results.get('fips', "") == '40003':
-                doc_no = doc_no[:4] + '-' + doc_no[4:]
             buyer_desc_row.append(doc_no)
             buyer_desc_row.append(parsed_results.get("recording_book_number", ""))
             buyer_desc_row.append(parsed_results.get("recording_page_number", ""))

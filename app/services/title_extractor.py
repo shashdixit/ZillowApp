@@ -92,23 +92,32 @@ class TitleExtractor:
 
         Here is a table of county names and their corresponding FIPS codes:
         COUNTY NAME,FIPS CODE
-        Clinton,26037
-        Whitley,21235
-        Clark,21049
-        Mccracken,21145
-        Bullitt,21029
-        Elliott,21063
-        Wolfe,21237
         Alfalfa,40003
+        Atoka,40005
         Beaver,40007
+        Bullitt,21029
+        Butler,21031
+        Carroll,21041
         Cimarron,40025
+        Clark,21049
+        Clinton,26037
         Coal,40029
         Dewey,40043
+        Elliott,21063
         Ellis,40045
+        Gallatin,21077
         Greer,40055
         Harper,40059
+        Hughes,40063
         Jefferson,40067
+        Lake,41037
+        Mccracken,21145
+        Pushmataha,40127
         Roger Mills,40129
+        Texas,40139
+        Todd,21219
+        Whitley,21235
+        Wolfe,21237
         """
 
         message_prompt = """
@@ -204,7 +213,7 @@ class TitleExtractor:
             logger.error(f"Error processing {pdf_path}: {e}")
             return os.path.basename(pdf_path), f"Error: {str(e)}", "Error"
 
-    async def process_batch(self, session, pdf_paths, task_id, task_status, total_files, batch_start_index, results_list, batch_size=5):
+    async def process_batch(self, session, pdf_paths, task_id, task_status, total_files, batch_start_index, results_list, batch_size=10):
         """Process a batch of PDF files concurrently."""
         tasks = [self.process_pdf(session, path, results_list) for path in pdf_paths]
         await asyncio.gather(*tasks)

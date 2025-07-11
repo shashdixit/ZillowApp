@@ -1,5 +1,4 @@
 import os
-import re
 from app.classify import classify_document
 from app.llm_utils import encode_pdf, query_llm, parse_csv_response
 
@@ -11,8 +10,15 @@ async def process_borrower_names(filename, session, system_prompt, message_promp
     if(classify_document(pdf_path) == 'D'):
         return None
 
-    match = re.search(r'\d+', filename)
-    doc_no = match.group() if match else None
+    filename_ = os.path.splitext(filename)[0]
+
+    # Extract recording document number from filename
+    if filename_.isdigit(): # Exceptions - Clinton
+        doc_no = filename_
+    elif filename_.startswith('2025_'):
+        doc_no = filename_[:4] + filename_[5:]
+    else:
+        doc_no = filename_[:-2]
 
     pdf_base64 = encode_pdf(pdf_path)
 
@@ -38,9 +44,13 @@ async def process_borrower_names(filename, session, system_prompt, message_promp
 
         all_output_rows = []
 
+        if parsed_results.get('fips', "") in ['40003', '40005', '40007', '40025', '40029', '40043', '40055', '40059', '40063', '40127', '40139', '40129', '41037']:
+            doc_no = doc_no[:4] + '-' + doc_no[4:]
+        elif parsed_results.get('fips', "") == '40067':
+            doc_no = 'W-' + doc_no[:6]
+
         # Write the rows to the CSV file
         while i + j < num_names:
-
             output_row = []
 
             # Common columns
@@ -49,8 +59,6 @@ async def process_borrower_names(filename, session, system_prompt, message_promp
             output_row.append(parsed_results.get("index_key", ""))
             output_row.append(parsed_results.get("data_class_stnd_code", ""))
             output_row.append(parsed_results.get("recording_date", ""))
-            if parsed_results.get('fips', "") == '40003':
-                doc_no = doc_no[:4] + '-' + doc_no[4:]
             output_row.append(doc_no)
             output_row.append(parsed_results.get("recording_book_number", ""))
             output_row.append(parsed_results.get("recording_page_number", ""))

@@ -54,7 +54,7 @@ async def extract_titles(
     background_tasks: BackgroundTasks,
     input_dir: str = Form(...),
     output_file: str = Form(...),
-    batch_size: int = Form(5)
+    batch_size: int = Form(10)
 ):
     """
     Extract titles from all PDF files in the input directory using LLM.

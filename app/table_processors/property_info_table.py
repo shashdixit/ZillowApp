@@ -1,5 +1,4 @@
 import os
-import re
 from app.llm_utils import encode_pdf, query_llm, parse_csv_response
 
 async def process_property_info_table(filename, session, system_prompt, message_prompt, all_column_names, PDF_DIRECTORY):
@@ -7,8 +6,15 @@ async def process_property_info_table(filename, session, system_prompt, message_
     pdf_path = os.path.join(PDF_DIRECTORY, filename)
     print(f"Processing Property Info Table for {filename}...")
 
-    match = re.search(r'\d+', filename)
-    doc_no = match.group() if match else None
+    filename_ = os.path.splitext(filename)[0]
+
+    # Extract recording document number from filename
+    if filename_.isdigit(): # Exceptions - Clinton
+        doc_no = filename_
+    elif filename_.startswith('2025_'):
+        doc_no = filename_[:4] + filename_[5:]
+    else:
+        doc_no = filename_[:-2]
 
     pdf_base64 = encode_pdf(pdf_path)
 
@@ -40,8 +46,10 @@ async def process_property_info_table(filename, session, system_prompt, message_
             output_row = []
             for column_name in all_column_names:
                 if column_name == 'recording_document_number':
-                    if parsed_results.get('fips', "") == '40003':
+                    if parsed_results.get('fips', "") in ['40003', '40005', '40007', '40025', '40029', '40043', '40055', '40059', '40063', '40127', '40139', '40129', '41037']:
                         doc_no = doc_no[:4] + '-' + doc_no[4:]
+                    elif parsed_results.get('fips', "") == '40067':
+                        doc_no = 'W-' + doc_no[:6]
                     output_row.append(doc_no)
                 elif column_name in ["fips","recording_book_number","recording_page_number","data_class_stnd_code","recording_date"]:
                     output_row.append(parsed_results.get(column_name, ""))
